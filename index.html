@@ -3,1060 +3,377 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ZS Prospect Intelligence</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#020817" />
-  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#060A12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="ZS Intel" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <meta name="apple-mobile-web-app-title" content="CyberIntel" />
+  <meta name="description" content="Healthcare Cybersecurity Intelligence Dashboard" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>HC Cyber Intel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg-base: #020817;
-      --bg-surface: #0d1526;
-      --bg-card: #111d35;
-      --bg-hover: #162040;
-      --accent: #0ea5e9;
-      --accent-dim: #0369a1;
-      --accent-glow: rgba(14,165,233,0.15);
-      --green: #10b981;
-      --green-dim: rgba(16,185,129,0.15);
-      --amber: #f59e0b;
-      --amber-dim: rgba(245,158,11,0.12);
-      --red: #ef4444;
-      --text-primary: #e2e8f0;
-      --text-secondary: #94a3b8;
-      --text-muted: #475569;
-      --border: rgba(255,255,255,0.07);
-      --border-accent: rgba(14,165,233,0.3);
-      --font: 'Outfit', sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { min-height: 100vh; min-height: 100dvh; }
+    body { background: #060A12; color: #fff; font-family: 'IBM Plex Sans', sans-serif; -webkit-font-smoothing: antialiased; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scanLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg-base);
-      color: var(--text-primary);
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+    .pulse-ring { animation: pulse 1.5s ease-in-out infinite; }
 
-    /* ── HEADER ── */
-    header {
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 16px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-      position: relative;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-mark {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), #6366f1);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 14px; color: #fff;
-      letter-spacing: -0.5px;
-    }
-    .logo-text { font-weight: 600; font-size: 16px; letter-spacing: -0.3px; }
-    .logo-sub { font-size: 10px; color: var(--text-muted); font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase; }
-
-    .header-actions { display: flex; gap: 8px; align-items: center; }
-
-    .btn-icon {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-secondary);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      transition: all 0.15s;
-    }
-    .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-    /* ── TABS ── */
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-surface);
-      flex-shrink: 0;
-    }
-    .tab {
-      flex: 1; padding: 10px 0;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.15s;
-      user-select: none;
-    }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-    /* ── MAIN CONTENT ── */
-    main {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .view {
-      position: absolute; inset: 0;
-      overflow-y: auto;
-      padding: 16px;
-      display: none;
-    }
-    .view.active { display: block; }
-
-    /* ── PROSPECT LIST ── */
-    .search-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-    }
-    .search-bar input {
-      flex: 1;
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-size: 14px;
-    }
-    .search-bar input::placeholder { color: var(--text-muted); }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
-    .empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
-    .empty-state p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-
-    .prospect-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .prospect-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .prospect-card:hover { border-color: var(--border-accent); background: var(--bg-hover); }
-    .prospect-card:hover::before { opacity: 1; }
-
-    .prospect-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 6px;
-    }
-    .prospect-name { font-weight: 600; font-size: 15px; }
-    .prospect-company { font-size: 12px; color: var(--accent); margin-top: 2px; }
-    .prospect-title { font-size: 12px; color: var(--text-muted); }
-    .prospect-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-    .badge-ready { background: var(--green-dim); color: var(--green); }
-    .badge-pending { background: var(--amber-dim); color: var(--amber); }
-    .badge-new { background: rgba(14,165,233,0.1); color: var(--accent); }
-
-    .prospect-meta {
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-    }
-    .prospect-meta span {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* ── ADD PROSPECT FORM ── */
-    .section-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      margin-top: 20px;
-    }
-    .section-label:first-child { margin-top: 0; }
-
-    .field {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .field label {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-family: var(--mono);
-      letter-spacing: 0.5px;
-    }
-    .field input, .field textarea, .field select {
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-size: 15px;
-      width: 100%;
-      resize: none;
-    }
-    .field input::placeholder,
-    .field textarea::placeholder { color: var(--text-muted); }
-    .field textarea { min-height: 120px; line-height: 1.5; font-size: 13px; }
-    .field:focus-within {
-      border-color: var(--border-accent);
-      background: var(--bg-hover);
-    }
-
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .field-row .field { margin-bottom: 0; }
-
-    .btn-primary {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 14px;
-      font-family: var(--font);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-primary:hover { background: #0284c7; }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-secondary {
-      width: 100%;
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      font-family: var(--font);
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.15s;
-      margin-top: 8px;
-    }
-    .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-    /* ── INTEL VIEW ── */
-    .intel-header {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .intel-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .intel-role { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
-    .intel-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag {
-      font-size: 11px;
-      font-family: var(--mono);
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: rgba(14,165,233,0.1);
-      color: var(--accent);
-      border: 1px solid rgba(14,165,233,0.2);
-    }
-    .tag.green { background: var(--green-dim); color: var(--green); border-color: rgba(16,185,129,0.2); }
-    .tag.amber { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,158,11,0.2); }
-
-    .intel-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .intel-section-title {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .intel-section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border-accent);
-    }
-    .intel-item {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: flex-start;
-    }
-    .intel-item:last-child { margin-bottom: 0; }
-    .intel-bullet {
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      margin-top: 7px;
-      flex-shrink: 0;
-    }
-    .intel-bullet.green { background: var(--green); }
-    .intel-bullet.amber { background: var(--amber); }
-    .intel-text { font-size: 14px; line-height: 1.6; color: var(--text-primary); }
-    .intel-text strong { color: var(--accent); font-weight: 600; }
-
-    .talking-point {
-      background: var(--bg-hover);
-      border: 1px solid var(--border-accent);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 8px;
-    }
-    .talking-point:last-child { margin-bottom: 0; }
-    .tp-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .tp-text { font-size: 14px; line-height: 1.6; color: var(--text-primary); }
-
-    /* ── LOADING ── */
-    .loading-container {
-      padding: 40px 20px;
-      text-align: center;
-    }
-    .loader {
-      width: 48px; height: 48px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 20px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { color: var(--text-secondary); font-size: 14px; }
-    .loading-step {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-
-    /* ── SETTINGS ── */
-    .settings-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-    .settings-row {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .settings-label { font-size: 14px; }
-    .settings-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .settings-value { color: var(--text-muted); font-size: 13px; }
-
-    /* ── MODALS ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      display: flex;
-      align-items: flex-end;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 20px 20px 0 0;
-      padding: 24px 20px;
-      width: 100%;
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-      max-height: 90dvh;
-      overflow-y: auto;
-    }
-    .modal-overlay.open .modal { transform: translateY(0); }
-    .modal-handle {
-      width: 40px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-
-    /* ── API KEY BANNER ── */
-    .api-banner {
-      background: rgba(245,158,11,0.1);
-      border: 1px solid rgba(245,158,11,0.3);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      font-size: 13px;
-      color: var(--amber);
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      cursor: pointer;
-    }
-
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in { animation: fadeSlideUp 0.3s ease both; }
-    .fade-in:nth-child(2) { animation-delay: 0.05s; }
-    .fade-in:nth-child(3) { animation-delay: 0.1s; }
-    .fade-in:nth-child(4) { animation-delay: 0.15s; }
-    .fade-in:nth-child(5) { animation-delay: 0.2s; }
-
-    .spinner-inline {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-
-    .delete-btn {
-      background: rgba(239,68,68,0.1);
-      color: var(--red);
-      border: 1px solid rgba(239,68,68,0.2);
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--font);
-    }
+    /* Prevent pull-to-refresh in PWA */
+    body { overscroll-behavior-y: contain; }
   </style>
 </head>
 <body>
+  <div id="root"></div>
 
-<!-- HEADER -->
-<header>
-  <div class="logo">
-    <div class="logo-mark">ZS</div>
-    <div>
-      <div class="logo-text">Prospect Intel</div>
-      <div class="logo-sub">Zscaler Healthcare AE</div>
-    </div>
-  </div>
-  <div class="header-actions">
-    <button class="btn-icon" onclick="openSettings()" title="Settings">⚙️</button>
-  </div>
-</header>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.5/babel.min.js"></script>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('list')">📋 Prospects</div>
-  <div class="tab" onclick="switchTab('add')">➕ Add New</div>
-  <div class="tab" onclick="switchTab('intel')" id="tab-intel" style="display:none">🎯 Intel</div>
-</div>
+  <script type="text/babel" data-type="module">
+    const { useState, useEffect, useCallback } = React;
 
-<!-- MAIN -->
-<main>
+    const API_KEY_STORAGE = 'hc_cyber_intel_api_key';
 
-  <!-- PROSPECTS LIST -->
-  <div class="view active" id="view-list">
-    <div class="search-bar">
-      <span>🔍</span>
-      <input type="text" placeholder="Search prospects..." id="search-input" oninput="renderList()" />
-    </div>
-    <div id="prospect-list-container"></div>
-  </div>
+    const CATEGORIES = [
+      { id: "breaches", label: "Healthcare Breaches", icon: "\u{1F3E5}", query: "healthcare cybersecurity breach incident 2026 hospital health system data breach", color: "#FF3B5C" },
+      { id: "cves", label: "Critical CVEs", icon: "\u{1F6E1}\uFE0F", query: "critical CVE vulnerability 2026 healthcare medical device EPSS CVSS high severity", color: "#00E5FF" },
+      { id: "hipaa", label: "HIPAA & Regulations", icon: "\u2696\uFE0F", query: "HIPAA cybersecurity regulation update 2026 HHS OCR healthcare compliance rule change", color: "#FFAB40" },
+      { id: "threats", label: "Threat Intelligence", icon: "\u{1F50D}", query: "ransomware threat healthcare 2026 threat actor APT hospital attack campaign", color: "#B388FF" },
+      { id: "zscaler", label: "Zscaler & Zero Trust", icon: "\u26A1", query: "Zscaler zero trust healthcare cybersecurity 2026 ZTNA SSE SASE health system", color: "#00E676" },
+    ];
 
-  <!-- ADD PROSPECT -->
-  <div class="view" id="view-add">
-    <div id="api-banner" class="api-banner" onclick="openSettings()" style="display:none">
-      ⚠️ <span>No API key set. Tap here to add your Anthropic API key to enable AI research.</span>
-    </div>
+    const SYSTEM_PROMPT = `You are a senior healthcare cybersecurity intelligence analyst. Your audience is a Zscaler healthcare account executive who needs competitive intelligence.
 
-    <div class="section-label">Prospect Details</div>
-    <div class="field">
-      <label>Full Name *</label>
-      <input type="text" id="f-name" placeholder="e.g. Sarah Johnson" />
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Title *</label>
-        <input type="text" id="f-title" placeholder="CISO" />
-      </div>
-      <div class="field">
-        <label>Company *</label>
-        <input type="text" id="f-company" placeholder="Mayo Clinic" />
-      </div>
-    </div>
-    <div class="field">
-      <label>Location</label>
-      <input type="text" id="f-location" placeholder="e.g. Rochester, MN" />
-    </div>
+IMPORTANT: Return ONLY valid JSON with no markdown, no backticks, no preamble. The JSON must be an array of objects.
 
-    <div class="section-label">Research Context</div>
-    <div class="field">
-      <label>LinkedIn URL (optional)</label>
-      <input type="text" id="f-linkedin" placeholder="https://linkedin.com/in/..." />
-    </div>
-    <div class="field">
-      <label>Paste LinkedIn Profile Text (optional)</label>
-      <textarea id="f-linkedin-text" placeholder="Copy & paste their LinkedIn About, Experience, or any section here to get deeper AI analysis..."></textarea>
-    </div>
-    <div class="field">
-      <label>Additional Context (optional)</label>
-      <textarea id="f-context" placeholder="e.g. Met at HIMSS, recently went through a breach, using Palo Alto, moving to Epic..." style="min-height:80px"></textarea>
-    </div>
+Each object must have these exact fields:
+- "title": string - concise headline (max 12 words)
+- "summary": string - 2-3 sentence briefing with specific details (names, dates, numbers)
+- "severity": string - one of "CRITICAL", "HIGH", "MEDIUM", "LOW"
+- "date": string - approximate date like "Mar 2026" or "Recent"
+- "source": string - publication or source name
+- "zscaler_angle": string - one sentence on how this is relevant to a Zscaler sales conversation (reference ZIA, ZPA, ZDX, or Zero Trust where appropriate)
+- "tags": array of strings - 2-4 relevant tags
 
-    <button class="btn-primary" onclick="runResearch()" id="research-btn">
-      🔍 Research & Generate Intel
-    </button>
-    <button class="btn-secondary" onclick="saveWithoutResearch()">
-      Save Without Research
-    </button>
-  </div>
+Return 5-8 items, sorted by severity then recency.`;
 
-  <!-- INTEL VIEW -->
-  <div class="view" id="view-intel">
-    <div id="intel-content"></div>
-  </div>
-
-</main>
-
-<!-- SETTINGS MODAL -->
-<div class="modal-overlay" id="settings-modal" onclick="closeSettings(event)">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">⚙️ Settings</div>
-
-    <div class="section-label">Anthropic API Key</div>
-    <div class="field">
-      <label>API Key (required for AI research)</label>
-      <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-    </div>
-    <p style="font-size:12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6">
-      Get your free API key at <strong style="color:var(--accent)">console.anthropic.com</strong>.
-      Your key is stored only on this device and never shared.
-    </p>
-
-    <div class="section-label">AE Profile</div>
-    <div class="field">
-      <label>Your Name</label>
-      <input type="text" id="ae-name-input" placeholder="e.g. Alex Rivera" />
-    </div>
-    <div class="field">
-      <label>Territory / Focus</label>
-      <input type="text" id="ae-territory-input" placeholder="e.g. Southeast, IDN accounts, Health Systems > 500 beds" />
-    </div>
-
-    <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
-    <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
-  </div>
-</div>
-
-<script>
-// ─────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────
-let prospects = JSON.parse(localStorage.getItem('zs_prospects') || '[]');
-let apiKey = localStorage.getItem('zs_api_key') || '';
-let aeName = localStorage.getItem('zs_ae_name') || '';
-let aeTerritory = localStorage.getItem('zs_ae_territory') || '';
-let activeProspectId = null;
-
-// ─────────────────────────────────────────
-// TABS
-// ─────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    const ids = ['list','add','intel'];
-    t.classList.toggle('active', ids[i] === tab);
-  });
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + tab).classList.add('active');
-
-  if (tab === 'add') checkApiBanner();
-  if (tab === 'list') renderList();
-}
-
-// ─────────────────────────────────────────
-// PROSPECT LIST
-// ─────────────────────────────────────────
-function renderList() {
-  const query = document.getElementById('search-input').value.toLowerCase();
-  const container = document.getElementById('prospect-list-container');
-
-  let filtered = prospects.filter(p =>
-    p.name.toLowerCase().includes(query) ||
-    p.company.toLowerCase().includes(query) ||
-    (p.title || '').toLowerCase().includes(query)
-  );
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🎯</div>
-        <h3>${query ? 'No results found' : 'No prospects yet'}</h3>
-        <p>${query ? 'Try a different search term' : 'Tap "Add New" to research your first healthcare prospect'}</p>
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map((p, i) => {
-    const badge = p.intel
-      ? `<span class="prospect-badge badge-ready">READY</span>`
-      : `<span class="prospect-badge badge-new">NEW</span>`;
-    const date = new Date(p.createdAt).toLocaleDateString('en-US', {month:'short', day:'numeric'});
-    return `
-      <div class="prospect-card fade-in" onclick="openProspect('${p.id}')">
-        <div class="prospect-card-top">
-          <div>
-            <div class="prospect-name">${p.name}</div>
-            <div class="prospect-company">${p.company}</div>
+    function ApiKeyPrompt({ onSave }) {
+      const [key, setKey] = useState('');
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ maxWidth: 400, width: '100%' }}>
+            <div style={{ fontSize: 48, textAlign: 'center', marginBottom: 16 }}>{"\u{1F6E1}\uFE0F"}</div>
+            <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, textAlign: 'center', marginBottom: 8,
+              background: 'linear-gradient(135deg, #fff 30%, #00E5FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              HC Cyber Intel
+            </h1>
+            <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 28 }}>
+              Enter your Anthropic API key to power live intelligence scans. Your key is stored locally on this device only.
+            </p>
+            <input
+              type="password"
+              placeholder="sk-ant-..."
+              value={key}
+              onChange={e => setKey(e.target.value)}
+              style={{
+                width: '100%', padding: '14px 16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12, outline: 'none'
+              }}
+            />
+            <button onClick={() => { if (key.trim()) { localStorage.setItem(API_KEY_STORAGE, key.trim()); onSave(key.trim()); }}}
+              style={{
+                width: '100%', padding: '14px', background: 'linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,230,118,0.15))',
+                border: '1px solid rgba(0,229,255,0.25)', borderRadius: 10, color: '#00E5FF', fontSize: 15, fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer'
+              }}>
+              Activate Intelligence Feed
+            </button>
+            <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', marginTop: 16 }}>
+              Get your key at console.anthropic.com
+            </p>
           </div>
-          ${badge}
         </div>
-        <div class="prospect-title">${p.title || ''}</div>
-        <div class="prospect-meta">
-          <span>📅 ${date}</span>
-          ${p.location ? `<span>📍 ${p.location}</span>` : ''}
-          ${p.intel ? `<span>✅ Intel ready</span>` : ''}
+      );
+    }
+
+    function IntelCard({ item, index, categoryColor }) {
+      const [expanded, setExpanded] = useState(false);
+      const severityColors = { CRITICAL: "#FF1744", HIGH: "#FF6D00", MEDIUM: "#FFAB40", LOW: "#69F0AE" };
+      const sevColor = severityColors[item.severity] || "#888";
+
+      return (
+        <div onClick={() => setExpanded(!expanded)}
+          style={{
+            background: 'rgba(10, 14, 23, 0.85)', border: `1px solid ${expanded ? categoryColor : 'rgba(255,255,255,0.06)'}`,
+            borderLeft: `3px solid ${sevColor}`, borderRadius: 8, padding: '14px 16px', cursor: 'pointer',
+            transition: 'all 0.25s ease', animationDelay: `${index * 60}ms`, animation: 'slideUp 0.4s ease both'
+          }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.5, color: sevColor, background: `${sevColor}18`, padding: '2px 7px', borderRadius: 3, fontFamily: "'JetBrains Mono', monospace" }}>{item.severity}</span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: "'JetBrains Mono', monospace" }}>{item.date}</span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>via {item.source}</span>
+              </div>
+              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.92)', fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.35 }}>{item.title}</h3>
+            </div>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', flexShrink: 0, marginTop: 2 }}>{expanded ? '\u25B2' : '\u25BC'}</span>
+          </div>
+
+          {expanded && (
+            <div style={{ marginTop: 12 }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.55, fontFamily: "'IBM Plex Sans', sans-serif" }}>{item.summary}</p>
+              <div style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.15)', borderRadius: 6, padding: '8px 12px', marginBottom: 10 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.5, color: '#00E676', marginBottom: 4, fontFamily: "'JetBrains Mono', monospace" }}>{"\u26A1"} ZSCALER ANGLE</div>
+                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.45, fontFamily: "'IBM Plex Sans', sans-serif" }}>{item.zscaler_angle}</p>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {(item.tags || []).map((tag, i) => (
+                  <span key={i} style={{ fontSize: 10, color: categoryColor, background: `${categoryColor}15`, border: `1px solid ${categoryColor}30`, padding: '2px 8px', borderRadius: 20, fontFamily: "'JetBrains Mono', monospace" }}>{tag}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>`;
-  }).join('');
-}
+      );
+    }
 
-function openProspect(id) {
-  const p = prospects.find(x => x.id === id);
-  if (!p) return;
-  activeProspectId = id;
+    function CategoryPanel({ category, data, loading, error, onRefresh }) {
+      return (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 20 }}>{category.icon}</span>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: category.color, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: -0.3 }}>{category.label}</h2>
+              {data && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace" }}>{data.length} items</span>}
+            </div>
+            <button onClick={() => onRefresh(category.id)} disabled={loading}
+              style={{ background: loading ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                color: loading ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.5)', padding: '4px 12px', borderRadius: 5, fontSize: 11,
+                cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'JetBrains Mono', monospace", transition: 'all 0.2s' }}>
+              {loading ? '\u27F3 Scanning...' : '\u21BB Refresh'}
+            </button>
+          </div>
+          {loading && !data && (
+            <div style={{ padding: 30, textAlign: 'center' }}>
+              <div className="pulse-ring" style={{ color: category.color, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>Querying intelligence sources...</div>
+            </div>
+          )}
+          {error && (
+            <div style={{ background: 'rgba(255,23,68,0.08)', border: '1px solid rgba(255,23,68,0.2)', borderRadius: 8, padding: 14, color: '#FF8A80', fontSize: 12, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+              {"\u26A0"} {error}
+            </div>
+          )}
+          {data && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {data.map((item, i) => <IntelCard key={i} item={item} index={i} categoryColor={category.color} />)}
+            </div>
+          )}
+        </div>
+      );
+    }
 
-  if (!p.intel) {
-    loadFormFromProspect(p);
-    switchTab('add');
-    return;
-  }
+    function App() {
+      const [apiKey, setApiKey] = useState(localStorage.getItem(API_KEY_STORAGE) || '');
+      const [results, setResults] = useState({});
+      const [loading, setLoading] = useState({});
+      const [errors, setErrors] = useState({});
+      const [lastUpdated, setLastUpdated] = useState(null);
+      const [activeFilter, setActiveFilter] = useState('all');
+      const [scanning, setScanning] = useState(false);
+      const [scanProgress, setScanProgress] = useState(0);
+      const [showSettings, setShowSettings] = useState(false);
 
-  document.getElementById('tab-intel').style.display = 'block';
-  renderIntel(p);
-  switchTab('intel');
-}
+      if (!apiKey) return <ApiKeyPrompt onSave={setApiKey} />;
 
-function loadFormFromProspect(p) {
-  document.getElementById('f-name').value = p.name || '';
-  document.getElementById('f-title').value = p.title || '';
-  document.getElementById('f-company').value = p.company || '';
-  document.getElementById('f-location').value = p.location || '';
-  document.getElementById('f-linkedin').value = p.linkedin || '';
-  document.getElementById('f-linkedin-text').value = p.linkedinText || '';
-  document.getElementById('f-context').value = p.context || '';
-}
+      const fetchCategory = async (category) => {
+        setLoading(p => ({ ...p, [category.id]: true }));
+        setErrors(p => ({ ...p, [category.id]: null }));
+        try {
+          const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 4096,
+              system: SYSTEM_PROMPT,
+              tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
+              messages: [{ role: 'user', content: `Search the web thoroughly for the latest intelligence on: ${category.query}\n\nAfter searching, return ONLY a JSON array of intelligence items. No markdown, no backticks, no explanation. Just the raw JSON array.` }],
+            }),
+          });
+          const data = await response.json();
+          if (data.error) throw new Error(data.error.message || 'API error');
+          const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+          const fullText = textBlocks.join('\n');
+          let jsonStr = fullText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+          const startIdx = jsonStr.indexOf('[');
+          const endIdx = jsonStr.lastIndexOf(']');
+          if (startIdx !== -1 && endIdx !== -1) jsonStr = jsonStr.substring(startIdx, endIdx + 1);
+          const items = JSON.parse(jsonStr);
+          setResults(p => ({ ...p, [category.id]: items }));
+        } catch (err) {
+          console.error(`Error fetching ${category.id}:`, err);
+          setErrors(p => ({ ...p, [category.id]: `Failed: ${err.message}` }));
+        } finally {
+          setLoading(p => ({ ...p, [category.id]: false }));
+        }
+      };
 
-// ─────────────────────────────────────────
-// ADD / RESEARCH
-// ─────────────────────────────────────────
-function checkApiBanner() {
-  document.getElementById('api-banner').style.display = apiKey ? 'none' : 'flex';
-}
+      const runFullScan = async () => {
+        setScanning(true);
+        setScanProgress(0);
+        for (let i = 0; i < CATEGORIES.length; i++) {
+          setScanProgress((i / CATEGORIES.length) * 100);
+          await fetchCategory(CATEGORIES[i]);
+          setScanProgress(((i + 1) / CATEGORIES.length) * 100);
+        }
+        setLastUpdated(new Date());
+        setScanning(false);
+      };
 
-function getFormData() {
-  return {
-    name: document.getElementById('f-name').value.trim(),
-    title: document.getElementById('f-title').value.trim(),
-    company: document.getElementById('f-company').value.trim(),
-    location: document.getElementById('f-location').value.trim(),
-    linkedin: document.getElementById('f-linkedin').value.trim(),
-    linkedinText: document.getElementById('f-linkedin-text').value.trim(),
-    context: document.getElementById('f-context').value.trim(),
-  };
-}
+      const handleRefresh = (categoryId) => {
+        const cat = CATEGORIES.find(c => c.id === categoryId);
+        if (cat) fetchCategory(cat);
+      };
 
-function saveWithoutResearch() {
-  const d = getFormData();
-  if (!d.name || !d.company) { alert('Name and Company are required.'); return; }
+      const clearKey = () => { localStorage.removeItem(API_KEY_STORAGE); setApiKey(''); };
 
-  const id = activeProspectId || Date.now().toString();
-  const existing = prospects.findIndex(p => p.id === id);
-  const prospect = { id, ...d, createdAt: existing >= 0 ? prospects[existing].createdAt : Date.now(), intel: null };
+      const filteredCategories = activeFilter === 'all' ? CATEGORIES : CATEGORIES.filter(c => c.id === activeFilter);
+      const totalItems = Object.values(results).reduce((acc, items) => acc + (items?.length || 0), 0);
+      const criticalCount = Object.values(results).flat().filter(i => i?.severity === 'CRITICAL').length;
 
-  if (existing >= 0) prospects[existing] = prospect;
-  else prospects.unshift(prospect);
+      return (
+        <div style={{ minHeight: '100vh', background: '#060A12', color: 'white', fontFamily: "'IBM Plex Sans', sans-serif", position: 'relative', overflow: 'hidden' }}>
+          {/* Background grid */}
+          <div style={{ position: 'fixed', inset: 0, backgroundImage: 'linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px)', backgroundSize: '40px 40px', animation: 'gridMove 8s linear infinite', pointerEvents: 'none', zIndex: 0 }} />
+          <div style={{ position: 'fixed', top: -200, right: -200, width: 500, height: 500, background: 'radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
-  saveProspects();
-  resetForm();
-  activeProspectId = null;
-  switchTab('list');
-}
+          <div style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto', padding: '24px 20px' }}>
+            {/* Header */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: scanning ? '#FFAB40' : '#00E676', boxShadow: scanning ? '0 0 12px #FFAB40' : '0 0 12px #00E676', animation: scanning ? 'pulse 0.8s ease infinite' : 'none' }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, color: 'rgba(255,255,255,0.35)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase' }}>
+                    {scanning ? 'Scanning Sources' : 'Intelligence Ready'}
+                  </span>
+                </div>
+                <button onClick={() => setShowSettings(!showSettings)}
+                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 18, cursor: 'pointer', padding: 4 }}>
+                  {"\u2699\uFE0F"}
+                </button>
+              </div>
 
-async function runResearch() {
-  const d = getFormData();
-  if (!d.name || !d.company) { alert('Name and Company are required.'); return; }
-  if (!apiKey) { openSettings(); return; }
+              {showSettings && (
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 14, marginTop: 12, marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontFamily: "'JetBrains Mono', monospace" }}>API Key: sk-...{apiKey.slice(-6)}</span>
+                    <button onClick={clearKey} style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#FF8A80', padding: '4px 12px', borderRadius: 5, fontSize: 11, cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace" }}>Reset Key</button>
+                  </div>
+                </div>
+              )}
 
-  const btn = document.getElementById('research-btn');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="spinner-inline"></span> Researching...`;
+              <h1 style={{ margin: '4px 0 4px 0', fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: -1, background: 'linear-gradient(135deg, #fff 30%, #00E5FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
+                HC Cyber Intel
+              </h1>
+              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.35)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                Healthcare Cybersecurity Intelligence {"\u00B7"} Zscaler Sales Enablement
+              </p>
+            </div>
 
-  try {
-    const intel = await callClaudeWithSearch(d);
+            {/* Stats bar */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+              {[
+                { label: 'TOTAL INTEL', value: totalItems || '\u2014', color: '#00E5FF' },
+                { label: 'CRITICAL', value: criticalCount || '\u2014', color: '#FF1744' },
+                { label: 'LAST SCAN', value: lastUpdated ? lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Never', color: '#FFAB40' },
+              ].map((stat, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '10px 14px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", marginBottom: 4 }}>{stat.label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: stat.color, fontFamily: "'Space Grotesk', sans-serif" }}>{stat.value}</div>
+                </div>
+              ))}
+            </div>
 
-    const id = activeProspectId || Date.now().toString();
-    const existing = prospects.findIndex(p => p.id === id);
-    const prospect = {
-      id,
-      ...d,
-      createdAt: existing >= 0 ? prospects[existing].createdAt : Date.now(),
-      intel
-    };
+            {/* Scan button */}
+            <button onClick={runFullScan} disabled={scanning}
+              style={{
+                width: '100%', padding: '14px 20px',
+                background: scanning ? 'rgba(255,171,64,0.08)' : 'linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(0,230,118,0.12) 100%)',
+                border: scanning ? '1px solid rgba(255,171,64,0.2)' : '1px solid rgba(0,229,255,0.2)',
+                borderRadius: 10, color: scanning ? '#FFAB40' : '#00E5FF', fontSize: 14, fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif", letterSpacing: 0.5,
+                cursor: scanning ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease',
+                position: 'relative', overflow: 'hidden', marginBottom: 20
+              }}>
+              {scanning && <div style={{ position: 'absolute', bottom: 0, left: 0, height: 2, background: 'linear-gradient(90deg, transparent, #FFAB40, transparent)', width: '50%', animation: 'scanLine 1.5s ease-in-out infinite' }} />}
+              {scanning ? `\u27F3 Scanning... ${Math.round(scanProgress)}%` : '\u25B6 Run Full Intelligence Scan'}
+            </button>
 
-    if (existing >= 0) prospects[existing] = prospect;
-    else prospects.unshift(prospect);
+            {scanning && (
+              <div style={{ marginBottom: 20, height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${scanProgress}%`, background: 'linear-gradient(90deg, #00E5FF, #00E676)', borderRadius: 3, transition: 'width 0.5s ease' }} />
+              </div>
+            )}
 
-    saveProspects();
-    activeProspectId = id;
+            {/* Filter pills */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+              <button onClick={() => setActiveFilter('all')}
+                style={{ padding: '6px 14px', borderRadius: 20, border: activeFilter === 'all' ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.08)', background: activeFilter === 'all' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)', color: activeFilter === 'all' ? 'white' : 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.2s' }}>
+                All Feeds
+              </button>
+              {CATEGORIES.map(cat => (
+                <button key={cat.id} onClick={() => setActiveFilter(cat.id)}
+                  style={{ padding: '6px 14px', borderRadius: 20, border: activeFilter === cat.id ? `1px solid ${cat.color}50` : '1px solid rgba(255,255,255,0.06)', background: activeFilter === cat.id ? `${cat.color}15` : 'rgba(255,255,255,0.02)', color: activeFilter === cat.id ? cat.color : 'rgba(255,255,255,0.35)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.2s' }}>
+                  {cat.icon} {cat.label}
+                </button>
+              ))}
+            </div>
 
-    document.getElementById('tab-intel').style.display = 'block';
-    renderIntel(prospect);
-    resetForm();
-    switchTab('intel');
-  } catch (err) {
-    alert('Research failed: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🔍 Research & Generate Intel';
-  }
-}
+            {/* Empty state */}
+            {!lastUpdated && !scanning && (
+              <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.2)' }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>{"\u{1F6E1}\uFE0F"}</div>
+                <div style={{ fontSize: 16, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, marginBottom: 6 }}>Ready to Scan</div>
+                <div style={{ fontSize: 13, fontFamily: "'IBM Plex Sans', sans-serif", maxWidth: 360, margin: '0 auto' }}>
+                  Hit "Run Full Intelligence Scan" to pull the latest healthcare cybersecurity intel from across the web.
+                </div>
+              </div>
+            )}
 
-// ─────────────────────────────────────────
-// CLAUDE API CALL
-// ─────────────────────────────────────────
-async function callClaudeWithSearch(d) {
-  const aeContext = aeName
-    ? `The AE is ${aeName}${aeTerritory ? `, focusing on ${aeTerritory}` : ''}.`
-    : 'The AE is a Healthcare Account Executive at Zscaler.';
+            {filteredCategories.map(cat => (
+              <CategoryPanel key={cat.id} category={cat} data={results[cat.id]} loading={loading[cat.id]} error={errors[cat.id]} onRefresh={handleRefresh} />
+            ))}
 
-  const linkedinSection = d.linkedinText
-    ? `\n\nLINKEDIN PROFILE TEXT:\n${d.linkedinText}`
-    : d.linkedin
-    ? `\n\nLinkedIn URL: ${d.linkedin} (search for this person)`
-    : '';
+            {/* Footer */}
+            <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.15)', fontFamily: "'JetBrains Mono', monospace" }}>
+              HC Cyber Intel {"\u00B7"} Powered by Claude AI + Web Search {"\u00B7"} Zscaler Healthcare
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-  const contextSection = d.context ? `\n\nADDITIONAL CONTEXT FROM AE:\n${d.context}` : '';
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 
-  const prompt = `You are a world-class B2B sales intelligence analyst specializing in healthcare IT and cybersecurity. ${aeContext}
-
-Research the following prospect and provide a structured intelligence brief to help the AE prospect them effectively for Zscaler's zero trust security platform (ZIA, ZPA, ZDX, ZSCALER for Healthcare).
-
-PROSPECT:
-- Name: ${d.name}
-- Title: ${d.title}
-- Company: ${d.company}
-- Location: ${d.location || 'Unknown'}${linkedinSection}${contextSection}
-
-Use web search to find recent news, publications, conference talks, press releases, or any public information about this person and their organization.
-
-Return your analysis as a JSON object with exactly this structure:
-{
-  "summary": "2-3 sentence executive summary of who this person is and why they matter",
-  "companyContext": [
-    {"point": "key fact about the company relevant to ZS", "type": "insight"}
-  ],
-  "prospectBackground": [
-    {"point": "career/background insight", "type": "insight"}
-  ],
-  "painPoints": [
-    {"point": "likely pain point Zscaler can solve", "type": "pain", "zsProduct": "ZIA/ZPA/ZDX/Platform"}
-  ],
-  "talkingPoints": [
-    {"label": "Opening Hook", "text": "specific opening line tailored to them"},
-    {"label": "Value Prop", "text": "Zscaler value prop specific to their situation"},
-    {"label": "Discovery Question", "text": "sharp discovery question to ask"},
-    {"label": "Objection Handler", "text": "anticipated objection and response"}
-  ],
-  "triggers": ["list of timely triggers: news, hires, tech changes, regulatory events"],
-  "competitorIntel": "brief note on likely competitors (Palo Alto, Cisco, Fortinet, etc.) and positioning",
-  "nextSteps": ["recommended outreach actions"],
-  "tags": ["3-5 short tags like HIMSS25, Epic, HIPAA, Series-C, etc."]
-}
-
-Be specific and actionable. Reference real facts you find. If you can't find something, make intelligent inferences based on their role and org type.`;
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  // Extract text from response (after tool use)
-  const textBlocks = data.content.filter(b => b.type === 'text');
-  const rawText = textBlocks.map(b => b.text).join('');
-
-  // Parse JSON from response
-  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Could not parse intel from AI response');
-
-  return JSON.parse(jsonMatch[0]);
-}
-
-// ─────────────────────────────────────────
-// RENDER INTEL
-// ─────────────────────────────────────────
-function renderIntel(p) {
-  const intel = p.intel;
-  const container = document.getElementById('intel-content');
-
-  if (!intel) {
-    container.innerHTML = `<div class="loading-container"><p>No intel available yet.</p></div>`;
-    return;
-  }
-
-  const tagsHtml = (intel.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
-
-  const companyHtml = (intel.companyContext || []).map(item => `
-    <div class="intel-item fade-in">
-      <div class="intel-bullet"></div>
-      <div class="intel-text">${item.point}</div>
-    </div>`).join('');
-
-  const bgHtml = (intel.prospectBackground || []).map(item => `
-    <div class="intel-item fade-in">
-      <div class="intel-bullet green"></div>
-      <div class="intel-text">${item.point}</div>
-    </div>`).join('');
-
-  const painHtml = (intel.painPoints || []).map(item => `
-    <div class="intel-item fade-in">
-      <div class="intel-bullet amber"></div>
-      <div class="intel-text">${item.point} ${item.zsProduct ? `<strong>[${item.zsProduct}]</strong>` : ''}</div>
-    </div>`).join('');
-
-  const tpHtml = (intel.talkingPoints || []).map(tp => `
-    <div class="talking-point fade-in">
-      <div class="tp-label">${tp.label}</div>
-      <div class="tp-text">${tp.text}</div>
-    </div>`).join('');
-
-  const triggersHtml = (intel.triggers || []).map(t => `
-    <div class="intel-item fade-in">
-      <div class="intel-bullet"></div>
-      <div class="intel-text">${t}</div>
-    </div>`).join('');
-
-  const stepsHtml = (intel.nextSteps || []).map((s, i) => `
-    <div class="intel-item fade-in">
-      <div class="intel-bullet green"></div>
-      <div class="intel-text"><strong>${i + 1}.</strong> ${s}</div>
-    </div>`).join('');
-
-  container.innerHTML = `
-    <div class="intel-header fade-in">
-      <div class="intel-name">${p.name}</div>
-      <div class="intel-role">${p.title} · ${p.company}${p.location ? ' · ' + p.location : ''}</div>
-      <div style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin: 12px 0">${intel.summary || ''}</div>
-      <div class="intel-tags">${tagsHtml}</div>
-    </div>
-
-    ${companyHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">🏥 Company Context</div>
-      ${companyHtml}
-    </div>` : ''}
-
-    ${bgHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">👤 Prospect Background</div>
-      ${bgHtml}
-    </div>` : ''}
-
-    ${painHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">⚡ Pain Points & Opportunities</div>
-      ${painHtml}
-    </div>` : ''}
-
-    ${tpHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">💬 Talking Points</div>
-      ${tpHtml}
-    </div>` : ''}
-
-    ${intel.competitorIntel ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">🥊 Competitive Intel</div>
-      <div class="intel-text" style="padding: 4px 0">${intel.competitorIntel}</div>
-    </div>` : ''}
-
-    ${triggersHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">📡 Engagement Triggers</div>
-      ${triggersHtml}
-    </div>` : ''}
-
-    ${stepsHtml ? `<div class="intel-section fade-in">
-      <div class="intel-section-title">🚀 Next Steps</div>
-      ${stepsHtml}
-    </div>` : ''}
-
-    <div style="padding: 16px 0">
-      <button class="btn-secondary" onclick="deleteProspect('${p.id}')">🗑️ Delete Prospect</button>
-    </div>
-  `;
-}
-
-function deleteProspect(id) {
-  if (!confirm('Delete this prospect?')) return;
-  prospects = prospects.filter(p => p.id !== id);
-  saveProspects();
-  document.getElementById('tab-intel').style.display = 'none';
-  activeProspectId = null;
-  switchTab('list');
-}
-
-// ─────────────────────────────────────────
-// SETTINGS
-// ─────────────────────────────────────────
-function openSettings() {
-  document.getElementById('api-key-input').value = apiKey;
-  document.getElementById('ae-name-input').value = aeName;
-  document.getElementById('ae-territory-input').value = aeTerritory;
-  document.getElementById('settings-modal').classList.add('open');
-}
-
-function closeSettings(e) {
-  if (e && e.target !== document.getElementById('settings-modal')) return;
-  document.getElementById('settings-modal').classList.remove('open');
-}
-
-function saveSettings() {
-  apiKey = document.getElementById('api-key-input').value.trim();
-  aeName = document.getElementById('ae-name-input').value.trim();
-  aeTerritory = document.getElementById('ae-territory-input').value.trim();
-  localStorage.setItem('zs_api_key', apiKey);
-  localStorage.setItem('zs_ae_name', aeName);
-  localStorage.setItem('zs_ae_territory', aeTerritory);
-  document.getElementById('settings-modal').classList.remove('open');
-  checkApiBanner();
-}
-
-// ─────────────────────────────────────────
-// UTILS
-// ─────────────────────────────────────────
-function saveProspects() {
-  localStorage.setItem('zs_prospects', JSON.stringify(prospects));
-}
-
-function resetForm() {
-  ['f-name','f-title','f-company','f-location','f-linkedin','f-linkedin-text','f-context']
-    .forEach(id => document.getElementById(id).value = '');
-}
-
-// ─────────────────────────────────────────
-// SERVICE WORKER
-// ─────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-// ─────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────
-renderList();
-checkApiBanner();
-</script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
