@@ -85,6 +85,7 @@ Return 5-8 items, sorted by severity then recency.`;
               placeholder="sk-ant-..."
               value={key}
               onChange={e => setKey(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && key.trim()) { localStorage.setItem(API_KEY_STORAGE, key.trim()); onSave(key.trim()); }}}
               style={{
                 width: '100%', padding: '14px 16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12, outline: 'none'
@@ -194,9 +195,7 @@ Return 5-8 items, sorted by severity then recency.`;
       const [scanProgress, setScanProgress] = useState(0);
       const [showSettings, setShowSettings] = useState(false);
 
-      if (!apiKey) return <ApiKeyPrompt onSave={setApiKey} />;
-
-      const fetchCategory = async (category) => {
+      const fetchCategory = useCallback(async (category) => {
         setLoading(p => ({ ...p, [category.id]: true }));
         setErrors(p => ({ ...p, [category.id]: null }));
         try {
@@ -227,9 +226,9 @@ Return 5-8 items, sorted by severity then recency.`;
         } finally {
           setLoading(p => ({ ...p, [category.id]: false }));
         }
-      };
+      }, [apiKey]);
 
-      const runFullScan = async () => {
+      const runFullScan = useCallback(async () => {
         setScanning(true);
         setScanProgress(0);
         for (let i = 0; i < CATEGORIES.length; i++) {
@@ -239,14 +238,17 @@ Return 5-8 items, sorted by severity then recency.`;
         }
         setLastUpdated(new Date());
         setScanning(false);
-      };
+        setScanProgress(0);
+      }, [fetchCategory]);
 
-      const handleRefresh = (categoryId) => {
+      const handleRefresh = useCallback((categoryId) => {
         const cat = CATEGORIES.find(c => c.id === categoryId);
         if (cat) fetchCategory(cat);
-      };
+      }, [fetchCategory]);
 
-      const clearKey = () => { localStorage.removeItem(API_KEY_STORAGE); setApiKey(''); };
+      const clearKey = useCallback(() => { localStorage.removeItem(API_KEY_STORAGE); setApiKey(''); }, []);
+
+      if (!apiKey) return <ApiKeyPrompt onSave={setApiKey} />;
 
       const filteredCategories = activeFilter === 'all' ? CATEGORIES : CATEGORIES.filter(c => c.id === activeFilter);
       const totalItems = Object.values(results).reduce((acc, items) => acc + (items?.length || 0), 0);

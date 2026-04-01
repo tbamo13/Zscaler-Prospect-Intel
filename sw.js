@@ -1,8 +1,10 @@
-const CACHE_NAME = 'hc-cyber-intel-v1';
+const CACHE_NAME = 'hc-cyber-intel-v2';
 const STATIC_ASSETS = [
   '/hc-cyber-intel/',
   '/hc-cyber-intel/index.html',
-  '/hc-cyber-intel/manifest.json'
+  '/hc-cyber-intel/manifest.json',
+  '/hc-cyber-intel/icon-192.png',
+  '/hc-cyber-intel/icon-512.png',
 ];
 
 self.addEventListener('install', event => {

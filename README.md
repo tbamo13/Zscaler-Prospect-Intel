@@ -1,47 +1,132 @@
-# HC Cyber Intel — PWA Deployment Guide
+# HC Cyber Intel — Installation & Deployment Guide
 
-## Quick Setup for timzscaler.com (GitHub Pages)
+A Progressive Web App (PWA) that delivers real-time healthcare cybersecurity intelligence with ready-made Zscaler sales talking points.
 
-### 1. Get your Anthropic API Key
-- Go to https://console.anthropic.com
-- Create an API key (you'll need the web search feature enabled)
-- The app will ask for this key on first launch and stores it locally on your device
+---
 
-### 2. Push files to your GitHub repo
-In your `timzscaler.com` repo (or whatever repo is behind your GitHub Pages):
+## Prerequisites
+
+- A GitHub account with a GitHub Pages-enabled repository
+- An Anthropic API key with web search access
+- A modern browser (Chrome 80+, Safari 14+, Edge 80+)
+
+---
+
+## Step 1 — Get Your Anthropic API Key
+
+1. Go to [console.anthropic.com](https://console.anthropic.com)
+2. Sign in or create an account
+3. Navigate to **API Keys** → **Create Key**
+4. Copy the key — it starts with `sk-ant-`
+5. Ensure your account has **web search** enabled (required for live intelligence scans)
+
+> **Cost estimate**: Each full scan makes ~5 API calls with web search. Typical cost is **$0.10–0.20 per full scan**.
+
+---
+
+## Step 2 — Deploy to GitHub Pages
+
+### File structure
+
+Place all 5 files into a folder named `hc-cyber-intel` in your repo:
 
 ```
 your-repo/
-├── hc-cyber-intel/
-│   ├── index.html       ← main app
-│   ├── manifest.json    ← PWA config
-│   ├── sw.js            ← service worker
-│   ├── icon-192.png     ← app icon
-│   └── icon-512.png     ← app icon
+└── hc-cyber-intel/
+    ├── index.html       ← main application
+    ├── manifest.json    ← PWA metadata
+    ├── sw.js            ← service worker (offline support)
+    ├── icon-192.png     ← app icon (small)
+    └── icon-512.png     ← app icon (large)
 ```
 
-Upload all 5 files into a folder called `hc-cyber-intel` in your repo.
+### Push to GitHub
 
-### 3. Install on Android
-1. Open Chrome on your phone
-2. Go to `https://timzscaler.com/hc-cyber-intel/`
-3. Chrome will show an "Add to Home Screen" banner, OR
-4. Tap the three-dot menu → "Install app" or "Add to Home Screen"
-5. The app will appear on your home screen like a native app
+```bash
+git add hc-cyber-intel/
+git commit -m "Add HC Cyber Intel PWA"
+git push origin main
+```
 
-### 4. First Launch
-- Enter your Anthropic API key when prompted
-- Tap "Run Full Intelligence Scan"
-- The app searches 5 intelligence categories with live web data
+### Enable GitHub Pages
 
-## What It Does
-- **Healthcare Breaches**: Latest hospital/health system data breach incidents
-- **Critical CVEs**: High-severity vulnerabilities in healthcare/medical devices
-- **HIPAA & Regulations**: HHS/OCR rule changes, compliance updates
-- **Threat Intelligence**: Ransomware campaigns targeting healthcare
-- **Zscaler & Zero Trust**: Competitive intel on ZTNA/SSE/SASE in healthcare
+1. Go to your repo on GitHub → **Settings** → **Pages**
+2. Under **Source**, select `Deploy from a branch`
+3. Choose `main` branch, `/ (root)` folder → **Save**
+4. Your app will be live at `https://<your-username>.github.io/<repo-name>/hc-cyber-intel/`
 
-Every item includes a **Zscaler Angle** — a ready-made talking point mapping the intel to ZIA, ZPA, ZDX, or Zero Trust for your prospect conversations.
+If you use a custom domain (e.g. `timzscaler.com`), your URL will be:
+`https://timzscaler.com/hc-cyber-intel/`
 
-## API Cost
-Each full scan makes ~5 API calls with web search. Typical cost is roughly $0.10-0.20 per full scan depending on response length.
+---
+
+## Step 3 — Install as a PWA
+
+### Android (Chrome) — Recommended
+
+1. Open **Chrome** on your Android device
+2. Navigate to your deployment URL
+3. Chrome will show an **"Add to Home Screen"** banner at the bottom — tap **Add**
+   - If the banner doesn't appear: tap the **three-dot menu (⋮)** → **"Install app"** or **"Add to Home Screen"**
+4. The app installs to your home screen and launches like a native app (no browser chrome)
+
+### iPhone / iPad (Safari)
+
+1. Open **Safari** on your iOS device (must be Safari — Chrome on iOS cannot install PWAs)
+2. Navigate to your deployment URL
+3. Tap the **Share button** (box with arrow at the bottom of the screen)
+4. Scroll down and tap **"Add to Home Screen"**
+5. Edit the name if desired → tap **Add**
+6. The app appears on your home screen
+
+### Desktop (Chrome / Edge)
+
+1. Navigate to your deployment URL in Chrome or Edge
+2. Look for the **install icon** (⊕ or computer icon) in the address bar — click it
+3. Click **Install** in the prompt
+4. The app opens in its own window, separate from the browser
+
+---
+
+## Step 4 — First Launch
+
+1. Open the app from your home screen
+2. Enter your Anthropic API key when prompted (`sk-ant-...`)
+   - Your key is stored **locally on your device only** — never sent anywhere except directly to the Anthropic API
+   - Press **Enter** or tap **Activate Intelligence Feed**
+3. Tap **▶ Run Full Intelligence Scan**
+4. The app scans 5 intelligence categories sequentially — takes ~60–90 seconds
+
+---
+
+## Intelligence Categories
+
+| Category | What It Covers |
+|---|---|
+| 🏥 Healthcare Breaches | Latest hospital and health system data breach incidents |
+| 🛡️ Critical CVEs | High-severity vulnerabilities in healthcare and medical devices |
+| ⚖️ HIPAA & Regulations | HHS/OCR rule changes and compliance updates |
+| 🔍 Threat Intelligence | Ransomware campaigns and APT activity targeting healthcare |
+| ⚡ Zscaler & Zero Trust | ZTNA/SSE/SASE competitive intel in healthcare |
+
+Every item includes a **Zscaler Angle** — a ready-made talking point mapping the threat to ZIA, ZPA, ZDX, or Zero Trust.
+
+---
+
+## Managing Your API Key
+
+- Tap the **⚙️ gear icon** (top right) to view or reset your API key
+- Tap **Reset Key** to clear it and enter a new one
+- The key is stored in browser `localStorage` under `hc_cyber_intel_api_key`
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|---|---|
+| "Failed: API error" on scan | Check your API key is valid and has web search enabled |
+| App won't install as PWA | Must be served over HTTPS (GitHub Pages provides this) |
+| iOS install option missing | Must use Safari, not Chrome, on iPhone/iPad |
+| Blank screen after install | Clear the app data and reload; service worker may have cached a stale version |
+| Scan hangs indefinitely | Check network connection; each category scan can take 15–30 seconds |
